@@ -6,59 +6,77 @@
   <title>Taller 3D — Control de producción</title>
   <style>
     :root {
-      --bg: #12151e;
-      --card-bg: #1a1e2b;
-      --border: #2a3042;
-      --text: #e1e7ec;
-      --text-muted: #8c9ba5;
-      --accent: #f5a623;
-      --accent-hover: #e0951a;
-      --input-bg: #121622;
-      --danger: #e74c3c;
-      --success: #2ecc71;
+      --bg: #0a0a0a;
+      --card-bg: #141414;
+      --border: #262626;
+      --border-hover: #404040;
+      --text: #ffffff;
+      --text-muted: #888888;
+      --input-bg: #000000;
+      --accent: #ffffff;
+      --accent-black: #000000;
+      --danger: #ff4d4d;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding: 16px; max-width: 950px; margin: 0 auto; }
+    body { background-color: var(--bg); color: var(--text); padding: 20px; max-width: 1000px; margin: 0 auto; }
 
-    header { margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    header { margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
     .brand { display: flex; align-items: center; gap: 12px; }
-    .logo { background: var(--accent); color: #000; font-weight: bold; padding: 6px 10px; border-radius: 6px; font-size: 1.2rem; }
-    h1 { font-size: 1.3rem; font-weight: 600; }
+    .logo { background: var(--accent); color: var(--accent-black); font-weight: 800; padding: 6px 10px; border-radius: 6px; font-size: 1.1rem; }
+    h1 { font-size: 1.3rem; font-weight: 600; tracking: -0.02em; }
     .subtitle { color: var(--text-muted); font-size: 0.85rem; margin-top: 2px; }
 
-    nav { display: flex; gap: 12px; border-bottom: 1px solid var(--border); margin-bottom: 20px; padding-bottom: 8px; }
-    nav button { background: none; border: none; color: var(--text-muted); font-size: 0.95rem; cursor: pointer; padding: 8px 16px; border-bottom: 2px solid transparent; }
-    nav button.active { color: var(--text); border-bottom-color: var(--accent); font-weight: 600; }
+    nav { display: flex; gap: 8px; margin-bottom: 24px; }
+    nav button { background: none; border: 1px solid var(--border); color: var(--text-muted); font-size: 0.9rem; cursor: pointer; padding: 8px 16px; border-radius: 6px; transition: all 0.2s; }
+    nav button:hover { border-color: var(--border-hover); color: var(--text); }
+    nav button.active { background: var(--accent); color: var(--accent-black); border-color: var(--accent); font-weight: 600; }
 
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 20px; }
-    .card h2 { font-size: 1.05rem; margin-bottom: 14px; font-weight: 500; color: var(--accent); }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+    .card h2 { font-size: 1.05rem; margin-bottom: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
 
     .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 14px; }
     .form-group { display: flex; flex-direction: column; gap: 6px; }
-    label { font-size: 0.8rem; color: var(--text-muted); }
-    input, select { background: var(--input-bg); border: 1px solid var(--border); color: var(--text); padding: 10px; border-radius: 6px; font-size: 0.9rem; outline: none; }
-    input:focus, select:focus { border-color: var(--accent); }
+    label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    input, select { background: var(--input-bg); border: 1px solid var(--border); color: var(--text); padding: 10px 12px; border-radius: 6px; font-size: 0.9rem; outline: none; transition: border 0.2s; }
+    input:focus, select:focus { border-color: var(--text); }
 
-    .btn-primary { background: var(--accent); color: #111; border: none; font-weight: 600; padding: 10px 16px; border-radius: 6px; cursor: pointer; transition: background 0.2s; height: 40px; }
-    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-primary { background: var(--accent); color: var(--accent-black); border: none; font-weight: 600; padding: 10px 16px; border-radius: 6px; cursor: pointer; transition: opacity 0.2s; height: 40px; }
+    .btn-primary:hover { opacity: 0.9; }
 
-    .inventory-list, .orders-list { display: grid; gap: 10px; }
-    .item-card { background: var(--input-bg); border: 1px solid var(--border); padding: 12px 16px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
-    .item-info { display: flex; align-items: center; gap: 12px; }
-    .color-swatch { width: 28px; height: 28px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); flex-shrink: 0; }
+    /* Estilos para Tarjetas con Gráficos Circulares */
+    .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .item-card { background: var(--input-bg); border: 1px solid var(--border); padding: 16px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; gap: 16px; position: relative; }
+    .item-card:hover { border-color: var(--border-hover); }
 
-    .calc-results { background: var(--input-bg); border: 1px solid var(--border); padding: 16px; border-radius: 8px; margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; text-align: center; }
-    .result-box h4 { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
-    .result-box p { font-size: 1.2rem; font-weight: bold; margin-top: 4px; color: var(--text); }
-    .result-box.total p { color: var(--accent); font-size: 1.4rem; }
+    .item-details { flex-grow: 1; }
+    .item-details h3 { font-size: 1rem; font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+    .color-dot { width: 10px; height: 10px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); display: inline-block; }
+    .item-details p { font-size: 0.8rem; color: var(--text-muted); }
 
-    .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
-    .badge-pending { background: #d35400; color: #fff; }
-    .badge-completed { background: var(--success); color: #000; }
+    /* Indicador Circular SVG */
+    .circle-container { position: relative; width: 64px; height: 64px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .circle-container svg { transform: rotate(-90deg); width: 64px; height: 64px; }
+    .circle-bg { fill: none; stroke: var(--border); stroke-width: 6; }
+    .circle-progress { fill: none; stroke: var(--text); stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
+    .circle-text { position: absolute; font-size: 0.75rem; font-weight: 700; color: var(--text); }
+
+    .btn-delete { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 0.8rem; padding: 4px; opacity: 0.6; transition: opacity 0.2s; }
+    .btn-delete:hover { opacity: 1; }
+
+    /* Calculadora & Resultados */
+    .calc-results { background: var(--input-bg); border: 1px solid var(--border); padding: 16px; border-radius: 8px; margin-top: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; text-align: center; }
+    .result-box h4 { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
+    .result-box p { font-size: 1.1rem; font-weight: 700; margin-top: 4px; }
+    .result-box.total p { color: var(--text); font-size: 1.3rem; text-decoration: underline; }
+
+    .orders-list { display: grid; gap: 12px; }
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+    .badge-pending { border: 1px solid var(--text-muted); color: var(--text-muted); }
+    .badge-completed { background: var(--text); color: var(--accent-black); }
   </style>
 </head>
 <body>
@@ -74,12 +92,12 @@
   </header>
 
   <nav>
-    <button class="active" onclick="switchTab('filamentos')">Filamentos</button>
-    <button onclick="switchTab('calculadora')">Calculadora</button>
-    <button onclick="switchTab('pedidos')">Pedidos</button>
+    <button class="active" onclick="switchTab('filamentos', event)">Filamentos</button>
+    <button onclick="switchTab('calculadora', event)">Calculadora</button>
+    <button onclick="switchTab('pedidos', event)">Pedidos</button>
   </nav>
 
-  <!-- Pestaña 1: Filamentos -->
+  <!-- TAB FILAMENTOS -->
   <div id="tab-filamentos" class="tab-content active">
     <div class="card">
       <h2>Añadir filamento</h2>
@@ -91,11 +109,11 @@
           </div>
           <div class="form-group">
             <label>Color</label>
-            <input type="text" id="colorName" placeholder="Rojo fuego" required>
+            <input type="text" id="colorName" placeholder="Blanco mate" required>
           </div>
           <div class="form-group">
             <label>Muestra de color</label>
-            <input type="color" id="colorHex" value="#f5a623" style="height: 40px; padding: 2px; cursor: pointer;">
+            <input type="color" id="colorHex" value="#ffffff" style="height: 40px; padding: 2px; cursor: pointer;">
           </div>
           <div class="form-group">
             <label>Stock actual (g)</label>
@@ -114,11 +132,11 @@
 
     <div class="card">
       <h2>Inventario de Filamentos</h2>
-      <div id="inventoryContainer" class="inventory-list"></div>
+      <div id="inventoryContainer" class="inventory-grid"></div>
     </div>
   </div>
 
-  <!-- Pestaña 2: Calculadora -->
+  <!-- TAB CALCULADORA -->
   <div id="tab-calculadora" class="tab-content">
     <div class="card">
       <h2>Calculadora de costes por pieza</h2>
@@ -161,22 +179,22 @@
           <p id="resPower">0.00 €</p>
         </div>
         <div class="result-box">
-          <h4>Coste Total Producción</h4>
+          <h4>Base Producción</h4>
           <p id="resBase">0.00 €</p>
         </div>
         <div class="result-box total">
-          <h4>Precio Venta Sugerido</h4>
+          <h4>Precio Sugerido</h4>
           <p id="resTotal">0.00 €</p>
         </div>
       </div>
       
       <div style="margin-top: 16px; text-align: right;">
-        <button type="button" class="btn-primary" onclick="createOrderFromCalc()">Crear Pedido y Descontar Stock</button>
+        <button type="button" class="btn-primary" onclick="createOrderFromCalc()">Guardar Pedido y Descontar Stock</button>
       </div>
     </div>
   </div>
 
-  <!-- Pestaña 3: Pedidos -->
+  <!-- TAB PEDIDOS -->
   <div id="tab-pedidos" class="tab-content">
     <div class="card">
       <h2>Control de Pedidos</h2>
@@ -200,19 +218,16 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    
     const filamentsRef = collection(db, "filamentos");
     const ordersRef = collection(db, "pedidos");
 
     let loadedFilaments = [];
 
-    // Navegación de pestañas
-    window.switchTab = (tabName) => {
+    window.switchTab = (tabName, evt) => {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
-      
       document.getElementById(`tab-${tabName}`).classList.add('active');
-      event.target.classList.add('active');
+      evt.target.classList.add('active');
     };
 
     // --- FILAMENTOS ---
@@ -234,7 +249,7 @@
       const select = document.getElementById('calcFilamentSelect');
       
       container.innerHTML = '';
-      select.innerHTML = '<option value="">Selecciona un filamento...</option>';
+      select.innerHTML = '<option value="">Seleccionar filamento...</option>';
       loadedFilaments = [];
 
       snapshot.forEach((docSnap) => {
@@ -242,31 +257,41 @@
         const id = docSnap.id;
         loadedFilaments.push({ id, ...item });
 
-        // Pintar Inventario
+        // Cálculo de porcentaje para el círculo (Asumiendo bobina estándar de 1000g)
+        const maxCapacity = 1000;
+        const percentage = Math.min(100, Math.max(0, Math.round((item.stock / maxCapacity) * 100)));
+        const strokeDashoffset = 163 - (163 * percentage) / 100; // 163 es el perímetro del círculo r=26
+
         const card = document.createElement('div');
         card.className = 'item-card';
         card.innerHTML = `
-          <div class="item-info">
-            <div class="color-swatch" style="background-color: ${item.colorHex};"></div>
-            <div>
-              <h3>${item.material} — ${item.colorName}</h3>
-              <p style="font-size:0.8rem; color:var(--text-muted)">Stock: <strong>${item.stock} g</strong> | Precio: <strong>${item.price.toFixed(2)} €/kg</strong></p>
-            </div>
+          <div class="item-details">
+            <h3><span class="color-dot" style="background:${item.colorHex}"></span> ${item.material}</h3>
+            <p>${item.colorName}</p>
+            <p style="margin-top:4px;"><strong>${item.price.toFixed(2)} €/kg</strong></p>
           </div>
-          <button style="background:none; border:1px solid var(--danger); color:var(--danger); padding:4px 8px; border-radius:4px; cursor:pointer;" onclick="deleteItem('${id}')">Eliminar</button>
+
+          <div class="circle-container">
+            <svg>
+              <circle class="circle-bg" cx="32" cy="32" r="26"></circle>
+              <circle class="circle-progress" cx="32" cy="32" r="26" style="stroke-dasharray: 163; stroke-dashoffset: ${strokeDashoffset};"></circle>
+            </svg>
+            <div class="circle-text">${item.stock}g</div>
+          </div>
+
+          <button class="btn-delete" onclick="deleteItem('${id}')" title="Eliminar">✕</button>
         `;
         container.appendChild(card);
 
-        // Llenar Select de Calculadora
         const opt = document.createElement('option');
         opt.value = id;
-        opt.textContent = `${item.material} - ${item.colorName} (${item.stock}g disponibles)`;
+        opt.textContent = `${item.material} - ${item.colorName} (${item.stock}g restantes)`;
         select.appendChild(opt);
       });
     });
 
     window.deleteItem = async (id) => {
-      if (confirm('¿Borrar filamento?')) await deleteDoc(doc(db, "filamentos", id));
+      if (confirm('¿Eliminar este filamento del inventario?')) await deleteDoc(doc(db, "filamentos", id));
     };
 
     // --- CALCULADORA ---
@@ -304,16 +329,15 @@
       const weight = Number(document.getElementById('calcWeight').value);
       
       if (!filId || !weight) {
-        alert("Por favor selecciona un filamento y peso válido.");
+        alert("Selecciona un filamento y peso válido.");
         return;
       }
 
-      const clientName = prompt("Nombre del cliente o referencia de pedido:");
+      const clientName = prompt("Nombre del cliente o proyecto:");
       if (!clientName) return;
 
       const filament = loadedFilaments.find(f => f.id === filId);
 
-      // 1. Guardar Pedido
       await addDoc(ordersRef, {
         client: clientName,
         filament: `${filament.material} (${filament.colorName})`,
@@ -323,12 +347,10 @@
         createdAt: new Date()
       });
 
-      // 2. Descontar Stock del Filamento
       const newStock = Math.max(0, filament.stock - weight);
       await updateDoc(doc(db, "filamentos", filId), { stock: newStock });
 
-      alert("¡Pedido guardado y stock de filamento descontado!");
-      switchTab('pedidos');
+      alert("Pedido registrado y stock descontado.");
     };
 
     // --- PEDIDOS ---
@@ -344,12 +366,12 @@
         card.className = 'item-card';
         card.innerHTML = `
           <div>
-            <h3>${item.client}</h3>
-            <p style="font-size:0.8rem; color:var(--text-muted)">${item.filament} | ${item.weight}g | Total: <strong>${item.price.toFixed(2)} €</strong></p>
+            <h3 style="font-size:1.05rem;">${item.client}</h3>
+            <p style="color:var(--text-muted); font-size:0.85rem; margin-top:2px;">${item.filament} | ${item.weight}g | Total: <strong>${item.price.toFixed(2)} €</strong></p>
           </div>
-          <div style="display:flex; gap:10px; align-items:center;">
+          <div style="display:flex; gap:12px; align-items:center;">
             <span class="badge ${item.status === 'Completado' ? 'badge-completed' : 'badge-pending'}">${item.status}</span>
-            <button style="background:none; border:1px solid var(--accent); color:var(--accent); padding:4px 8px; border-radius:4px; cursor:pointer;" onclick="toggleOrderStatus('${id}', '${item.status}')">Cambiar Estado</button>
+            <button style="background:none; border:1px solid var(--border); color:var(--text); padding:6px 12px; border-radius:6px; cursor:pointer; font-size:0.8rem;" onclick="toggleOrderStatus('${id}', '${item.status}')">Estado</button>
           </div>
         `;
         container.appendChild(card);

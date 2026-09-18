@@ -13,8 +13,8 @@
       --text: #d1d5db;
       --text-muted: #9ca3af;
       --input-bg: #16181d;
-      --accent: #e5e7eb;
-      --accent-hover: #ffffff;
+      --accent: #f5a623;
+      --accent-hover: #e0951a;
       --accent-black: #111827;
       --danger: #ef4444;
       --success: #10b981;
@@ -38,16 +38,21 @@
     .tab-content.active { display: block; }
 
     .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
-    .card h2 { font-size: 0.95rem; margin-bottom: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+    .card h2 { font-size: 1rem; margin-bottom: 16px; font-weight: 600; color: #f3f4f6; }
 
     .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 14px; }
     .form-group { display: flex; flex-direction: column; gap: 6px; }
     label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
     input, select { background: var(--input-bg); border: 1px solid var(--border); color: #f3f4f6; padding: 10px 12px; border-radius: 6px; font-size: 0.9rem; outline: none; transition: border 0.2s; }
-    input:focus, select:focus { border-color: #6b7280; }
+    input:focus, select:focus { border-color: var(--accent); }
 
-    .btn-primary { background: #2a2e39; color: #ffffff; border: 1px solid #4b5563; font-weight: 600; padding: 10px 16px; border-radius: 6px; cursor: pointer; transition: all 0.2s; height: 40px; }
-    .btn-primary:hover { background: #374151; }
+    .btn-primary { background: var(--accent); color: var(--accent-black); border: none; font-weight: 600; padding: 10px 16px; border-radius: 6px; cursor: pointer; transition: all 0.2s; height: 40px; }
+    .btn-primary:hover { background: var(--accent-hover); }
+
+    .btn-secondary { background: #2a2e39; color: #ffffff; border: 1px solid #4b5563; font-weight: 600; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
+    .btn-secondary:hover { background: #374151; }
+
+    .color-row { display: grid; grid-template-columns: 2fr 1fr auto; gap: 10px; align-items: center; margin-bottom: 10px; }
 
     .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
     .item-card { background: var(--input-bg); border: 1px solid var(--border); padding: 16px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
@@ -61,15 +66,10 @@
     .btn-delete { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 0.8rem; padding: 4px; opacity: 0.6; }
     .btn-delete:hover { opacity: 1; }
 
-    .calc-results { background: var(--input-bg); border: 1px solid var(--border); padding: 16px; border-radius: 8px; margin-top: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; text-align: center; }
-    .result-box h4 { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
-    .result-box p { font-size: 1.05rem; font-weight: 600; margin-top: 4px; }
-
-    /* Control de producción en Pedidos */
+    /* Orders List Styles */
     .orders-list { display: grid; gap: 16px; }
     .order-card { background: var(--input-bg); border: 1px solid var(--border); padding: 18px; border-radius: 10px; display: flex; flex-direction: column; gap: 12px; }
     .order-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
-    .order-header h3 { font-size: 1rem; color: #f3f4f6; }
     
     .production-control { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; background: var(--card-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border); }
     .prod-inputs { display: flex; align-items: center; gap: 8px; }
@@ -79,6 +79,7 @@
 
     .progress-bar-bg { background: var(--border); height: 6px; border-radius: 3px; overflow: hidden; width: 100%; margin-top: 4px; }
     .progress-bar-fill { background: var(--success); height: 100%; width: 0%; transition: width 0.3s; }
+    .info-note { font-size: 0.8rem; color: var(--text-muted); margin-top: -6px; margin-bottom: 12px; }
   </style>
 </head>
 <body>
@@ -95,7 +96,6 @@
 
   <nav>
     <button class="active" onclick="switchTab('filamentos', event)">Filamentos</button>
-    <button onclick="switchTab('calculadora', event)">Calculadora</button>
     <button onclick="switchTab('pedidos', event)">Pedidos</button>
   </nav>
 
@@ -138,68 +138,72 @@
     </div>
   </div>
 
-  <!-- TAB CALCULADORA -->
-  <div id="tab-calculadora" class="tab-content">
-    <div class="card">
-      <h2>Calculadora de costes por pieza</h2>
-      <form id="calcForm">
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Filamento</label>
-            <select id="calcFilamentSelect" required></select>
-          </div>
-          <div class="form-group">
-            <label>Peso total (g)</label>
-            <input type="number" id="calcWeight" placeholder="120" min="1" required>
-          </div>
-          <div class="form-group">
-            <label>Unidades totales</label>
-            <input type="number" id="calcUnits" value="1" min="1" required>
-          </div>
-          <div class="form-group">
-            <label>Piezas por tanda</label>
-            <input type="number" id="calcBatchSize" value="1" min="1" required>
-          </div>
-          <div class="form-group">
-            <label>Tiempo Impresión (h)</label>
-            <input type="number" id="calcHours" step="0.1" placeholder="4.5" required>
-          </div>
-          <div class="form-group">
-            <label>Margen (%)</label>
-            <input type="number" id="calcMargin" value="30" required>
-          </div>
-        </div>
-      </form>
-
-      <div class="calc-results">
-        <div class="result-box">
-          <h4>Coste Filamento</h4>
-          <p id="resFilament">0.00 €</p>
-        </div>
-        <div class="result-box">
-          <h4>Coste Luz</h4>
-          <p id="resPower">0.00 €</p>
-        </div>
-        <div class="result-box">
-          <h4>Base Producción</h4>
-          <p id="resBase">0.00 €</p>
-        </div>
-        <div class="result-box">
-          <h4>Precio Sugerido</h4>
-          <p id="resTotal" style="color:#f3f4f6; font-weight:700;">0.00 €</p>
-        </div>
-      </div>
-      
-      <div style="margin-top: 16px; text-align: right;">
-        <button type="button" class="btn-primary" onclick="createOrderFromCalc()">Crear Pedido y Descontar Stock</button>
-      </div>
-    </div>
-  </div>
-
   <!-- TAB PEDIDOS -->
   <div id="tab-pedidos" class="tab-content">
     <div class="card">
-      <h2>Control de Pedidos y Producción</h2>
+      <h2>Nuevo pedido</h2>
+      <form id="orderForm">
+        <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="form-group">
+            <label>Cliente</label>
+            <input type="text" id="orderClient" placeholder="Nombre del cliente" required>
+          </div>
+          <div class="form-group">
+            <label>Objeto</label>
+            <input type="text" id="orderObject" placeholder="Soporte para móvil" required>
+          </div>
+        </div>
+
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;">Filamentos usados (añade uno por cada color de la pieza)</p>
+        <div id="filamentRowsContainer"></div>
+        <button type="button" class="btn-secondary" onclick="addFilamentRow()" style="margin-bottom: 16px;">+ Añadir otro color</button>
+
+        <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));">
+          <div class="form-group">
+            <label>¿Cómo mides los gramos de arriba?</label>
+            <select id="gramMeasurementType" onchange="updateBatchInfo()">
+              <option value="unidad">Por unidad</option>
+              <option value="tanda">Por tanda en la cama</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Horas de impresión (por tanda)</label>
+            <input type="number" id="orderHours" value="2" step="0.1" required>
+          </div>
+          <div class="form-group">
+            <label>Unidades (total pedido)</label>
+            <input type="number" id="orderUnits" value="1" min="1" oninput="updateBatchInfo()" required>
+          </div>
+          <div class="form-group">
+            <label>Unidades por cama (tanda)</label>
+            <input type="number" id="orderUnitsPerBed" value="1" min="1" oninput="updateBatchInfo()" required>
+          </div>
+        </div>
+
+        <div id="batchInfoText" class="info-note">Se imprime en 1 sola tanda. Los gramos que has puesto arriba son los que gasta una sola unidad.</div>
+
+        <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr; align-items: flex-end;">
+          <div class="form-group">
+            <label>Precio de venta por unidad (€)</label>
+            <input type="number" id="orderUnitPrice" step="0.01" value="18.00" required>
+          </div>
+          <div class="form-group">
+            <label>Estado</label>
+            <select id="orderStatus">
+              <option value="Pendiente">Pendiente</option>
+              <option value="En producción">En producción</option>
+              <option value="Completado">Completado</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <button type="submit" class="btn-primary" style="width: 100%;">Crear pedido</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Control de Pedidos</h2>
       <div id="ordersContainer" class="orders-list"></div>
     </div>
   </div>
@@ -246,9 +250,7 @@
 
     onSnapshot(filamentsRef, (snapshot) => {
       const container = document.getElementById('inventoryContainer');
-      const select = document.getElementById('calcFilamentSelect');
       container.innerHTML = '';
-      select.innerHTML = '<option value="">Seleccionar filamento...</option>';
       loadedFilaments = [];
 
       snapshot.forEach((docSnap) => {
@@ -256,8 +258,7 @@
         const id = docSnap.id;
         loadedFilaments.push({ id, ...item });
 
-        const maxCap = 1000;
-        const pct = Math.min(100, Math.max(0, Math.round((item.stock / maxCap) * 100)));
+        const pct = Math.min(100, Math.max(0, Math.round((item.stock / 1000) * 100)));
         const offset = 150 - (150 * pct) / 100;
 
         const card = document.createElement('div');
@@ -275,77 +276,90 @@
           <button class="btn-delete" onclick="deleteItem('${id}')">✕</button>
         `;
         container.appendChild(card);
-
-        const opt = document.createElement('option');
-        opt.value = id;
-        opt.textContent = `${item.material} - ${item.colorName} (${item.stock}g)`;
-        select.appendChild(opt);
       });
+
+      if (document.querySelectorAll('.color-row').length === 0) addFilamentRow();
     });
 
     window.deleteItem = async (id) => {
       if (confirm('¿Eliminar filamento?')) await deleteDoc(doc(db, "filamentos", id));
     };
 
-    // CALCULADORA
-    ['calcFilamentSelect', 'calcWeight', 'calcHours', 'calcMargin', 'calcUnits'].forEach(id => {
-      document.getElementById(id).addEventListener('input', calculateCost);
-    });
-
-    let currentPrice = 0;
-
-    function calculateCost() {
-      const filId = document.getElementById('calcFilamentSelect').value;
-      const weight = Number(document.getElementById('calcWeight').value) || 0;
-      const hours = Number(document.getElementById('calcHours').value) || 0;
-      const margin = Number(document.getElementById('calcMargin').value) || 0;
-
-      const filament = loadedFilaments.find(f => f.id === filId);
-      const filPrice = filament ? (filament.price / 1000) : 0;
-
-      const costFil = weight * filPrice;
-      const costPwr = (150 / 1000) * hours * 0.25;
-      const base = costFil + costPwr;
-      currentPrice = base * (1 + (margin / 100));
-
-      document.getElementById('resFilament').textContent = `${costFil.toFixed(2)} €`;
-      document.getElementById('resPower').textContent = `${costPwr.toFixed(2)} €`;
-      document.getElementById('resBase').textContent = `${base.toFixed(2)} €`;
-      document.getElementById('resTotal').textContent = `${currentPrice.toFixed(2)} €`;
-    }
-
-    window.createOrderFromCalc = async () => {
-      const filId = document.getElementById('calcFilamentSelect').value;
-      const weight = Number(document.getElementById('calcWeight').value);
-      const totalUnits = Number(document.getElementById('calcUnits').value) || 1;
-      const batchSize = Number(document.getElementById('calcBatchSize').value) || 1;
+    // FILAMENT ROWS DINÁMICOS
+    window.addFilamentRow = () => {
+      const container = document.getElementById('filamentRowsContainer');
+      const div = document.createElement('div');
+      div.className = 'color-row';
       
-      if (!filId || !weight) return alert("Selecciona filamento y peso.");
+      let optionsHtml = loadedFilaments.map(f => `<option value="${f.id}">${f.colorName.toUpperCase()} — ${f.material} (${f.price.toFixed(2)} €/kg)</option>`).join('');
 
-      const clientName = prompt("Nombre del cliente o pedido:");
-      if (!clientName) return;
+      div.innerHTML = `
+        <select class="row-filament">${optionsHtml}</select>
+        <input type="number" class="row-grams" placeholder="40" min="1" required>
+        <button type="button" class="btn-delete" onclick="this.parentElement.remove()">✕</button>
+      `;
+      container.appendChild(div);
+    };
 
-      const filament = loadedFilaments.find(f => f.id === filId);
+    window.updateBatchInfo = () => {
+      const units = Number(document.getElementById('orderUnits').value) || 1;
+      const bed = Number(document.getElementById('orderUnitsPerBed').value) || 1;
+      const type = document.getElementById('gramMeasurementType').value;
+
+      const batches = Math.ceil(units / bed);
+      const modeText = type === 'unidad' ? 'son los que gasta una sola unidad.' : 'son los que gasta la cama completa por tanda.';
+      
+      document.getElementById('batchInfoText').textContent = `Se imprime en ${batches} tanda(s). Los gramos que has puesto arriba ${modeText}`;
+    };
+
+    // GUARDAR PEDIDO
+    document.getElementById('orderForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const client = document.getElementById('orderClient').value;
+      const objectName = document.getElementById('orderObject').value;
+      const units = Number(document.getElementById('orderUnits').value);
+      const unitsPerBed = Number(document.getElementById('orderUnitsPerBed').value);
+      const unitPrice = Number(document.getElementById('orderUnitPrice').value);
+      const status = document.getElementById('orderStatus').value;
+      const hours = Number(document.getElementById('orderHours').value);
+      const measureType = document.getElementById('gramMeasurementType').value;
+
+      const rows = document.querySelectorAll('.color-row');
+      let selectedFilaments = [];
+
+      for (let row of rows) {
+        const filId = row.querySelector('.row-filament').value;
+        const grams = Number(row.querySelector('.row-grams').value);
+        const filObj = loadedFilaments.find(f => f.id === filId);
+
+        selectedFilaments.push({ filId, grams, name: `${filObj.material} (${filObj.colorName})` });
+
+        // Descontar Stock
+        const totalGramsUsed = measureType === 'unidad' ? grams * units : grams * Math.ceil(units / unitsPerBed);
+        const newStock = Math.max(0, filObj.stock - totalGramsUsed);
+        await updateDoc(doc(db, "filamentos", filId), { stock: newStock });
+      }
 
       await addDoc(ordersRef, {
-        client: clientName,
-        filament: `${filament.material} (${filament.colorName})`,
-        weight: weight,
-        price: currentPrice,
-        totalUnits: totalUnits,
+        client,
+        objectName,
+        units,
+        unitsPerBed,
+        unitPrice,
+        totalPrice: units * unitPrice,
+        status,
+        hours,
         producedUnits: 0,
-        batchSize: batchSize,
+        filaments: selectedFilaments,
         createdAt: new Date()
       });
 
-      const newStock = Math.max(0, filament.stock - weight);
-      await updateDoc(doc(db, "filamentos", filId), { stock: newStock });
+      document.getElementById('orderForm').reset();
+      alert("Pedido creado y stock actualizado.");
+    });
 
-      alert("Pedido guardado con éxito.");
-      switchTab('pedidos', { target: document.querySelectorAll('nav button')[2] });
-    };
-
-    // PEDIDOS & CONTROL DE PRODUCCIÓN
+    // LISTAR PEDIDOS
     onSnapshot(ordersRef, (snapshot) => {
       const container = document.getElementById('ordersContainer');
       container.innerHTML = '';
@@ -353,7 +367,7 @@
       snapshot.forEach((docSnap) => {
         const item = docSnap.data();
         const id = docSnap.id;
-        const total = item.totalUnits || 1;
+        const total = item.units || 1;
         const produced = item.producedUnits || 0;
         const pct = Math.min(100, Math.round((produced / total) * 100));
 
@@ -362,8 +376,10 @@
         card.innerHTML = `
           <div class="order-header">
             <div>
-              <h3>${item.client}</h3>
-              <p style="color:var(--text-muted); font-size:0.8rem;">${item.filament} | Total: <strong>${item.price.toFixed(2)} €</strong></p>
+              <h3 style="color:#f3f4f6;">${item.client} — <span style="color:var(--accent);">${item.objectName}</span></h3>
+              <p style="color:var(--text-muted); font-size:0.8rem; margin-top:2px;">
+                Total: <strong>${item.totalPrice.toFixed(2)} €</strong> (${item.units} uds x ${item.unitPrice.toFixed(2)} €)
+              </p>
             </div>
             <button class="btn-delete" onclick="deleteOrder('${id}')">Eliminar</button>
           </div>
@@ -376,7 +392,7 @@
 
             <div class="prod-inputs">
               <input type="number" min="0" max="${total}" value="${produced}" onchange="updateProducedManual('${id}', this.value)">
-              <button class="btn-batch" onclick="addBatch('${id}', ${produced}, ${item.batchSize || 1}, ${total})">+${item.batchSize || 1} Tanda</button>
+              <button class="btn-batch" onclick="addBatch('${id}', ${produced}, ${item.unitsPerBed || 1}, ${total})">+1 Tanda (${item.unitsPerBed || 1} uds)</button>
             </div>
           </div>
 

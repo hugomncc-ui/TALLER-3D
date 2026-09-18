@@ -3,208 +3,256 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Taller 3D — Control de producción</title>
+  <title>Taller 3D — ERP Profesional</title>
   <style>
     :root {
-      --bg: #121417;
-      --card-bg: #1a1d24;
-      --border: #2a2e39;
-      --border-hover: #3b4050;
-      --text: #d1d5db;
-      --text-muted: #9ca3af;
-      --input-bg: #16181d;
+      --bg: #0f1115;
+      --card-bg: #181b21;
+      --border: #262b33;
+      --border-hover: #373e4a;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --input-bg: #111318;
       --accent: #f5a623;
-      --accent-hover: #e0951a;
-      --accent-black: #111827;
+      --accent-hover: #fcd34d;
+      --accent-black: #0f1115;
       --danger: #ef4444;
       --success: #10b981;
+      --info: #3b82f6;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding: 20px; max-width: 1000px; margin: 0 auto; }
+    body { background-color: var(--bg); color: var(--text); padding: 24px; max-width: 1200px; margin: 0 auto; }
 
     header { margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
     .brand { display: flex; align-items: center; gap: 12px; }
-    .logo { background: var(--accent); color: var(--accent-black); font-weight: 700; padding: 6px 10px; border-radius: 6px; font-size: 1rem; }
-    h1 { font-size: 1.25rem; font-weight: 600; color: #f3f4f6; }
-    .subtitle { color: var(--text-muted); font-size: 0.85rem; margin-top: 2px; }
+    .logo { background: var(--accent); color: var(--accent-black); font-weight: 800; padding: 6px 10px; border-radius: 6px; font-size: 1.1rem; }
+    h1 { font-size: 1.4rem; font-weight: 600; color: #f8fafc; }
 
-    nav { display: flex; gap: 8px; margin-bottom: 24px; }
-    nav button { background: none; border: 1px solid var(--border); color: var(--text-muted); font-size: 0.9rem; cursor: pointer; padding: 8px 16px; border-radius: 6px; transition: all 0.2s; }
-    nav button:hover { border-color: var(--border-hover); color: #f3f4f6; }
-    nav button.active { background: #2a2e39; color: #ffffff; border-color: #4b5563; font-weight: 600; }
+    nav { display: flex; gap: 8px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 8px; }
+    nav button { background: none; border: 1px solid var(--border); color: var(--text-muted); font-size: 0.9rem; cursor: pointer; padding: 8px 16px; border-radius: 6px; transition: all 0.2s; white-space: nowrap; }
+    nav button:hover { border-color: var(--border-hover); color: #f8fafc; }
+    nav button.active { background: #262b33; color: #ffffff; border-color: #475569; font-weight: 600; }
 
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
-    .card h2 { font-size: 1rem; margin-bottom: 16px; font-weight: 600; color: #f3f4f6; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+    .card h2 { font-size: 1.1rem; margin-bottom: 20px; font-weight: 600; color: #f8fafc; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
 
-    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 14px; }
-    .form-group { display: flex; flex-direction: column; gap: 6px; }
-    label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-    input, select { background: var(--input-bg); border: 1px solid var(--border); color: #f3f4f6; padding: 10px 12px; border-radius: 6px; font-size: 0.9rem; outline: none; transition: border 0.2s; }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+    label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+    input, select { background: var(--input-bg); border: 1px solid var(--border); color: #f8fafc; padding: 10px 12px; border-radius: 6px; font-size: 0.9rem; outline: none; transition: border 0.2s; }
     input:focus, select:focus { border-color: var(--accent); }
 
-    .btn-primary { background: var(--accent); color: var(--accent-black); border: none; font-weight: 600; padding: 10px 16px; border-radius: 6px; cursor: pointer; transition: all 0.2s; height: 40px; }
+    .btn-primary { background: var(--accent); color: var(--accent-black); border: none; font-weight: 700; padding: 10px 16px; border-radius: 6px; cursor: pointer; transition: all 0.2s; height: 42px; }
     .btn-primary:hover { background: var(--accent-hover); }
+    .btn-secondary { background: #262b33; color: #ffffff; border: 1px solid #475569; font-weight: 600; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
+    .btn-secondary:hover { background: #334155; }
+    .btn-delete { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 0.85rem; padding: 6px; font-weight: 600; }
+    .btn-delete:hover { text-decoration: underline; }
 
-    .btn-secondary { background: #2a2e39; color: #ffffff; border: 1px solid #4b5563; font-weight: 600; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
-    .btn-secondary:hover { background: #374151; }
+    /* Dashboard Metrics */
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .metric-card { background: var(--input-bg); border: 1px solid var(--border); padding: 20px; border-radius: 10px; display: flex; flex-direction: column; gap: 8px; }
+    .metric-card h3 { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .metric-card p { font-size: 1.8rem; font-weight: 700; color: #f8fafc; }
+    .metric-card .profit { color: var(--success); }
 
-    .color-row { display: grid; grid-template-columns: 2fr 1fr auto; gap: 10px; align-items: center; margin-bottom: 10px; }
-
+    /* Layout Grids */
+    .color-row { display: grid; grid-template-columns: 2fr 1fr auto; gap: 12px; align-items: center; margin-bottom: 12px; background: var(--input-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border); }
     .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-    .item-card { background: var(--input-bg); border: 1px solid var(--border); padding: 16px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-
-    .circle-container { position: relative; width: 60px; height: 60px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-    .circle-container svg { transform: rotate(-90deg); width: 60px; height: 60px; }
-    .circle-bg { fill: none; stroke: var(--border); stroke-width: 5; }
-    .circle-progress { fill: none; stroke: var(--text); stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
-    .circle-text { position: absolute; font-size: 0.75rem; font-weight: 600; color: #f3f4f6; }
-
-    .btn-delete { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 0.8rem; padding: 4px; opacity: 0.6; }
-    .btn-delete:hover { opacity: 1; }
-
-    /* Orders List Styles */
     .orders-list { display: grid; gap: 16px; }
-    .order-card { background: var(--input-bg); border: 1px solid var(--border); padding: 18px; border-radius: 10px; display: flex; flex-direction: column; gap: 12px; }
-    .order-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
-    
-    .production-control { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; background: var(--card-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border); }
-    .prod-inputs { display: flex; align-items: center; gap: 8px; }
-    .prod-inputs input { width: 70px; text-align: center; padding: 6px; }
-    .btn-batch { background: #1f2937; border: 1px solid #374151; color: #f3f4f6; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; }
-    .btn-batch:hover { background: #374151; }
 
-    .progress-bar-bg { background: var(--border); height: 6px; border-radius: 3px; overflow: hidden; width: 100%; margin-top: 4px; }
-    .progress-bar-fill { background: var(--success); height: 100%; width: 0%; transition: width 0.3s; }
-    .info-note { font-size: 0.8rem; color: var(--text-muted); margin-top: -6px; margin-bottom: 12px; }
+    /* Item Cards */
+    .item-card { background: var(--input-bg); border: 1px solid var(--border); padding: 16px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    
+    .order-card { background: var(--input-bg); border: 1px solid var(--border); padding: 20px; border-radius: 10px; display: flex; flex-direction: column; gap: 16px; }
+    .order-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+    .order-meta { display: flex; gap: 8px; align-items: center; margin-top: 6px; }
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+    .badge-channel { background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+    
+    .financial-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: #0f1115; padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-top: 8px; }
+    .fin-item { display: flex; flex-direction: column; gap: 4px; }
+    .fin-item span { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
+    .fin-item strong { font-size: 1rem; color: #f8fafc; }
+    .fin-item.net strong { color: var(--success); }
+
+    .production-control { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; background: var(--card-bg); padding: 16px; border-radius: 8px; border: 1px solid var(--border); }
+    .prod-inputs { display: flex; align-items: center; gap: 8px; }
+    .prod-inputs input { width: 80px; text-align: center; padding: 8px; font-weight: bold; }
+    .progress-bar-bg { background: var(--border); height: 8px; border-radius: 4px; overflow: hidden; width: 100%; margin-top: 8px; }
+    .progress-bar-fill { background: var(--accent); height: 100%; width: 0%; transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+
+    /* Circle Progress */
+    .circle-container { position: relative; width: 64px; height: 64px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .circle-container svg { transform: rotate(-90deg); width: 64px; height: 64px; }
+    .circle-bg { fill: none; stroke: var(--border); stroke-width: 6; }
+    .circle-progress { fill: none; stroke: var(--text); stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
+    .circle-text { position: absolute; font-size: 0.75rem; font-weight: 700; color: #f8fafc; }
   </style>
 </head>
 <body>
 
   <header>
     <div class="brand">
-      <div class="logo">3D</div>
+      <div class="logo">ERP</div>
       <div>
-        <h1>Taller 3D — Control de producción</h1>
-        <p class="subtitle">Filamento, costes y pedidos en un solo sitio</p>
+        <h1>Control de Producción & Finanzas</h1>
+        <p class="subtitle">Gestión integral de manufactura aditiva</p>
       </div>
     </div>
   </header>
 
   <nav>
-    <button class="active" onclick="switchTab('filamentos', event)">Filamentos</button>
-    <button onclick="switchTab('pedidos', event)">Pedidos</button>
+    <button class="active" onclick="switchTab('resumen', event)">Dashboard</button>
+    <button onclick="switchTab('pedidos', event)">Ventas y Producción</button>
+    <button onclick="switchTab('filamentos', event)">Inventario (Stock)</button>
   </nav>
 
-  <!-- TAB FILAMENTOS -->
-  <div id="tab-filamentos" class="tab-content active">
-    <div class="card">
-      <h2>Añadir filamento</h2>
-      <form id="filamentForm">
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Material</label>
-            <input type="text" id="material" placeholder="PLA, PETG..." required>
-          </div>
-          <div class="form-group">
-            <label>Color</label>
-            <input type="text" id="colorName" placeholder="Gris Grafito" required>
-          </div>
-          <div class="form-group">
-            <label>Muestra</label>
-            <input type="color" id="colorHex" value="#6b7280" style="height: 40px; padding: 2px; cursor: pointer;">
-          </div>
-          <div class="form-group">
-            <label>Stock (g)</label>
-            <input type="number" id="stock" placeholder="1000" min="0" required>
-          </div>
-          <div class="form-group">
-            <label>Precio (€/kg)</label>
-            <input type="number" id="price" step="0.01" placeholder="19.90" min="0" required>
-          </div>
-          <div class="form-group" style="justify-content: flex-end;">
-            <button type="submit" class="btn-primary">Añadir a inventario</button>
-          </div>
-        </div>
-      </form>
+  <!-- TAB 1: DASHBOARD -->
+  <div id="tab-resumen" class="tab-content active">
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <h3>Facturación Total</h3>
+        <p id="dashRevenue">0.00 €</p>
+      </div>
+      <div class="metric-card">
+        <h3>Beneficio Neto Puro</h3>
+        <p id="dashProfit" class="profit">0.00 €</p>
+      </div>
+      <div class="metric-card">
+        <h3>Pedidos Activos</h3>
+        <p id="dashActiveOrders">0</p>
+      </div>
+      <div class="metric-card">
+        <h3>Piezas Pendientes</h3>
+        <p id="dashPendingParts">0</p>
+      </div>
     </div>
-
+    
     <div class="card">
-      <h2>Inventario de Filamentos</h2>
-      <div id="inventoryContainer" class="inventory-grid"></div>
+      <h2>Última actividad</h2>
+      <div id="recentActivityContainer" class="orders-list">
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Cargando datos financieros...</p>
+      </div>
     </div>
   </div>
 
-  <!-- TAB PEDIDOS -->
+  <!-- TAB 2: PEDIDOS & CALCULADORA -->
   <div id="tab-pedidos" class="tab-content">
     <div class="card">
-      <h2>Nuevo pedido</h2>
+      <h2>Registrar Nueva Venta (Calculadora Integrada)</h2>
       <form id="orderForm">
-        <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+        <div class="form-grid" style="grid-template-columns: 2fr 1fr;">
           <div class="form-group">
-            <label>Cliente</label>
-            <input type="text" id="orderClient" placeholder="Nombre del cliente" required>
+            <label>Objeto / Producto</label>
+            <input type="text" id="orderObject" placeholder="Ej: Soporte mando PS5" required>
           </div>
           <div class="form-group">
-            <label>Objeto</label>
-            <input type="text" id="orderObject" placeholder="Soporte para móvil" required>
+            <label>Canal de Venta</label>
+            <select id="orderChannel">
+              <option value="Vinted">Vinted</option>
+              <option value="Wallapop">Wallapop</option>
+              <option value="Directo">Cliente Directo</option>
+              <option value="Otro">Otro</option>
+            </select>
           </div>
         </div>
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label>Cliente / Referencia</label>
+          <input type="text" id="orderClient" placeholder="Nombre de usuario o ID de envío" required>
+        </div>
 
-        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;">Filamentos usados (añade uno por cada color de la pieza)</p>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:8px; font-weight: 600;">MATERIALES CONSUMIDOS (Por unidad)</p>
         <div id="filamentRowsContainer"></div>
-        <button type="button" class="btn-secondary" onclick="addFilamentRow()" style="margin-bottom: 16px;">+ Añadir otro color</button>
+        <button type="button" class="btn-secondary" onclick="addFilamentRow()" style="margin-bottom: 24px;">+ Añadir otro color/material</button>
 
-        <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));">
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:8px; font-weight: 600;">DATOS DE FABRICACIÓN</p>
+        <div class="form-grid">
           <div class="form-group">
-            <label>¿Cómo mides los gramos de arriba?</label>
-            <select id="gramMeasurementType" onchange="updateBatchInfo()">
-              <option value="unidad">Por unidad</option>
-              <option value="tanda">Por tanda en la cama</option>
+            <label>Máquina asignada</label>
+            <select id="orderMachine">
+              <option value="200">Elegoo Neptune 4 (200W)</option>
+              <option value="300">Impresora CoreXY (300W)</option>
+              <option value="150">Genérica (150W)</option>
             </select>
           </div>
           <div class="form-group">
             <label>Horas de impresión (por tanda)</label>
-            <input type="number" id="orderHours" value="2" step="0.1" required>
+            <input type="number" id="orderHours" value="2.5" step="0.1" required>
           </div>
           <div class="form-group">
-            <label>Unidades (total pedido)</label>
-            <input type="number" id="orderUnits" value="1" min="1" oninput="updateBatchInfo()" required>
-          </div>
-          <div class="form-group">
-            <label>Unidades por cama (tanda)</label>
-            <input type="number" id="orderUnitsPerBed" value="1" min="1" oninput="updateBatchInfo()" required>
+            <label>Coste eléctrico (€/kWh)</label>
+            <input type="number" id="orderKwh" value="0.25" step="0.01" required>
           </div>
         </div>
 
-        <div id="batchInfoText" class="info-note">Se imprime en 1 sola tanda. Los gramos que has puesto arriba son los que gasta una sola unidad.</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Unidades totales vendidas</label>
+            <input type="number" id="orderUnits" value="1" min="1" required>
+          </div>
+          <div class="form-group">
+            <label>Unidades que caben por cama</label>
+            <input type="number" id="orderUnitsPerBed" value="1" min="1" required>
+          </div>
+          <div class="form-group">
+            <label>Precio de venta (CADA UNIDAD)</label>
+            <input type="number" id="orderUnitPrice" step="0.01" placeholder="0.00" required>
+          </div>
+        </div>
 
-        <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr; align-items: flex-end;">
+        <div class="form-group" style="margin-top: 16px;">
+          <button type="submit" class="btn-primary">Calcular Beneficio, Descontar Stock y Crear Pedido</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Control de Producción Activa</h2>
+      <div id="ordersContainer" class="orders-list"></div>
+    </div>
+  </div>
+
+  <!-- TAB 3: INVENTARIO -->
+  <div id="tab-filamentos" class="tab-content">
+    <div class="card">
+      <h2>Alta de Bobinas</h2>
+      <form id="filamentForm">
+        <div class="form-grid">
           <div class="form-group">
-            <label>Precio de venta por unidad (€)</label>
-            <input type="number" id="orderUnitPrice" step="0.01" value="18.00" required>
+            <label>Material</label>
+            <input type="text" id="material" placeholder="PLA, PETG, TPU..." required>
           </div>
           <div class="form-group">
-            <label>Estado</label>
-            <select id="orderStatus">
-              <option value="Pendiente">Pendiente</option>
-              <option value="En producción">En producción</option>
-              <option value="Completado">Completado</option>
-            </select>
+            <label>Color / Variante</label>
+            <input type="text" id="colorName" placeholder="Negro Mate" required>
           </div>
           <div class="form-group">
-            <button type="submit" class="btn-primary" style="width: 100%;">Crear pedido</button>
+            <label>Muestra Visual</label>
+            <input type="color" id="colorHex" value="#262b33" style="height: 42px; padding: 2px; cursor: pointer;">
+          </div>
+          <div class="form-group">
+            <label>Peso Neto (g)</label>
+            <input type="number" id="stock" placeholder="1000" min="0" required>
+          </div>
+          <div class="form-group">
+            <label>Coste Real (€/kg)</label>
+            <input type="number" id="price" step="0.01" placeholder="15.50" min="0" required>
+          </div>
+          <div class="form-group" style="justify-content: flex-end;">
+            <button type="submit" class="btn-primary">Registrar Bobina</button>
           </div>
         </div>
       </form>
     </div>
 
     <div class="card">
-      <h2>Control de Pedidos</h2>
-      <div id="ordersContainer" class="orders-list"></div>
+      <h2>Stock Actual</h2>
+      <div id="inventoryContainer" class="inventory-grid"></div>
     </div>
   </div>
 
@@ -212,6 +260,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+    // REEMPLAZAR CON TUS CLAVES
     const firebaseConfig = {
       apiKey: "AIzaSyAEFQO0ulPrzrbmDOsvhHYKphnGnMJTDi8",
       authDomain: "taller-3d-000.firebaseapp.com",
@@ -227,6 +276,7 @@
     const ordersRef = collection(db, "pedidos");
 
     let loadedFilaments = [];
+    let allOrders = [];
 
     window.switchTab = (tabName, evt) => {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -235,7 +285,7 @@
       evt.target.classList.add('active');
     };
 
-    // FILAMENTOS
+    // --- MÓDULO: INVENTARIO ---
     document.getElementById('filamentForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       await addDoc(filamentsRef, {
@@ -259,18 +309,18 @@
         loadedFilaments.push({ id, ...item });
 
         const pct = Math.min(100, Math.max(0, Math.round((item.stock / 1000) * 100)));
-        const offset = 150 - (150 * pct) / 100;
+        const offset = 163 - (163 * pct) / 100; // r=26 -> perimetro ~163
 
         const card = document.createElement('div');
         card.className = 'item-card';
         card.innerHTML = `
           <div>
-            <h3 style="font-size:0.95rem; color:#f3f4f6;">${item.material}</h3>
-            <p style="color:var(--text-muted); font-size:0.8rem;">${item.colorName}</p>
-            <p style="font-size:0.8rem; margin-top:4px;">${item.price.toFixed(2)} €/kg</p>
+            <h3 style="font-size:1rem; color:#f8fafc; margin-bottom:4px;">${item.material}</h3>
+            <p style="color:var(--text-muted); font-size:0.85rem;">${item.colorName}</p>
+            <p style="font-size:0.85rem; margin-top:6px; font-weight:600;">${item.price.toFixed(2)} €/kg</p>
           </div>
           <div class="circle-container">
-            <svg><circle class="circle-bg" cx="30" cy="30" r="24"></circle><circle class="circle-progress" cx="30" cy="30" r="24" style="stroke-dasharray:150; stroke-dashoffset:${offset};"></circle></svg>
+            <svg><circle class="circle-bg" cx="32" cy="32" r="26"></circle><circle class="circle-progress" cx="32" cy="32" r="26" style="stroke-dasharray:163; stroke-dashoffset:${offset};"></circle></svg>
             <div class="circle-text">${item.stock}g</div>
           </div>
           <button class="btn-delete" onclick="deleteItem('${id}')">✕</button>
@@ -282,126 +332,183 @@
     });
 
     window.deleteItem = async (id) => {
-      if (confirm('¿Eliminar filamento?')) await deleteDoc(doc(db, "filamentos", id));
+      if (confirm('¿Eliminar bobina del inventario?')) await deleteDoc(doc(db, "filamentos", id));
     };
 
-    // FILAMENT ROWS DINÁMICOS
     window.addFilamentRow = () => {
       const container = document.getElementById('filamentRowsContainer');
       const div = document.createElement('div');
       div.className = 'color-row';
       
-      let optionsHtml = loadedFilaments.map(f => `<option value="${f.id}">${f.colorName.toUpperCase()} — ${f.material} (${f.price.toFixed(2)} €/kg)</option>`).join('');
+      let optionsHtml = loadedFilaments.map(f => `<option value="${f.id}">${f.colorName} — ${f.material} (${f.price.toFixed(2)} €/kg)</option>`).join('');
 
       div.innerHTML = `
         <select class="row-filament">${optionsHtml}</select>
-        <input type="number" class="row-grams" placeholder="40" min="1" required>
+        <input type="number" class="row-grams" placeholder="Gramos por unidad" min="1" required>
         <button type="button" class="btn-delete" onclick="this.parentElement.remove()">✕</button>
       `;
       container.appendChild(div);
     };
 
-    window.updateBatchInfo = () => {
-      const units = Number(document.getElementById('orderUnits').value) || 1;
-      const bed = Number(document.getElementById('orderUnitsPerBed').value) || 1;
-      const type = document.getElementById('gramMeasurementType').value;
-
-      const batches = Math.ceil(units / bed);
-      const modeText = type === 'unidad' ? 'son los que gasta una sola unidad.' : 'son los que gasta la cama completa por tanda.';
-      
-      document.getElementById('batchInfoText').textContent = `Se imprime en ${batches} tanda(s). Los gramos que has puesto arriba ${modeText}`;
-    };
-
-    // GUARDAR PEDIDO
+    // --- MÓDULO: PEDIDOS Y CÁLCULO DE BENEFICIO ---
     document.getElementById('orderForm').addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const client = document.getElementById('orderClient').value;
       const objectName = document.getElementById('orderObject').value;
-      const units = Number(document.getElementById('orderUnits').value);
+      const channel = document.getElementById('orderChannel').value;
+      const client = document.getElementById('orderClient').value;
+      
+      const machinePowerW = Number(document.getElementById('orderMachine').value);
+      const hoursPerBed = Number(document.getElementById('orderHours').value);
+      const kwhPrice = Number(document.getElementById('orderKwh').value);
+      
+      const unitsTotal = Number(document.getElementById('orderUnits').value);
       const unitsPerBed = Number(document.getElementById('orderUnitsPerBed').value);
       const unitPrice = Number(document.getElementById('orderUnitPrice').value);
-      const status = document.getElementById('orderStatus').value;
-      const hours = Number(document.getElementById('orderHours').value);
-      const measureType = document.getElementById('gramMeasurementType').value;
 
       const rows = document.querySelectorAll('.color-row');
+      let totalFilamentCostPerUnit = 0;
       let selectedFilaments = [];
 
+      // 1. Procesar Coste Material y Stock
       for (let row of rows) {
         const filId = row.querySelector('.row-filament').value;
-        const grams = Number(row.querySelector('.row-grams').value);
+        const gramsPerUnit = Number(row.querySelector('.row-grams').value);
         const filObj = loadedFilaments.find(f => f.id === filId);
 
-        selectedFilaments.push({ filId, grams, name: `${filObj.material} (${filObj.colorName})` });
+        const costPerGram = filObj.price / 1000;
+        totalFilamentCostPerUnit += (gramsPerUnit * costPerGram);
 
-        // Descontar Stock
-        const totalGramsUsed = measureType === 'unidad' ? grams * units : grams * Math.ceil(units / unitsPerBed);
-        const newStock = Math.max(0, filObj.stock - totalGramsUsed);
+        selectedFilaments.push({ filId, gramsPerUnit, name: `${filObj.material} (${filObj.colorName})` });
+
+        // Descontar inventario total necesario
+        const totalGramsNeeded = gramsPerUnit * unitsTotal;
+        const newStock = Math.max(0, filObj.stock - totalGramsNeeded);
         await updateDoc(doc(db, "filamentos", filId), { stock: newStock });
       }
 
+      // 2. Calcular Finanzas (Total)
+      const batchesNeeded = Math.ceil(unitsTotal / unitsPerBed);
+      const totalHours = batchesNeeded * hoursPerBed;
+      
+      const totalPowerCost = (machinePowerW / 1000) * totalHours * kwhPrice;
+      const totalMaterialCost = totalFilamentCostPerUnit * unitsTotal;
+      const totalProductionCost = totalPowerCost + totalMaterialCost;
+      
+      const grossRevenue = unitsTotal * unitPrice;
+      const netProfit = grossRevenue - totalProductionCost;
+
+      // 3. Guardar en Base de Datos
       await addDoc(ordersRef, {
-        client,
         objectName,
-        units,
+        channel,
+        client,
+        unitsTotal,
         unitsPerBed,
-        unitPrice,
-        totalPrice: units * unitPrice,
-        status,
-        hours,
         producedUnits: 0,
+        grossRevenue,
+        netProfit,
+        totalProductionCost,
         filaments: selectedFilaments,
-        createdAt: new Date()
+        status: "Pendiente",
+        createdAt: new Date().toISOString()
       });
 
       document.getElementById('orderForm').reset();
-      alert("Pedido creado y stock actualizado.");
+      document.getElementById('filamentRowsContainer').innerHTML = '';
+      addFilamentRow();
+      switchTab('pedidos', { target: document.querySelectorAll('nav button')[1] });
     });
 
-    // LISTAR PEDIDOS
+    // --- MÓDULO: RENDERIZADO DE PEDIDOS Y DASHBOARD ---
     onSnapshot(ordersRef, (snapshot) => {
       const container = document.getElementById('ordersContainer');
+      const recentContainer = document.getElementById('recentActivityContainer');
       container.innerHTML = '';
+      recentContainer.innerHTML = '';
+      
+      allOrders = [];
+      let sumRevenue = 0;
+      let sumProfit = 0;
+      let countActive = 0;
+      let countPendingParts = 0;
 
       snapshot.forEach((docSnap) => {
         const item = docSnap.data();
-        const id = docSnap.id;
-        const total = item.units || 1;
-        const produced = item.producedUnits || 0;
-        const pct = Math.min(100, Math.round((produced / total) * 100));
+        item.id = docSnap.id;
+        allOrders.push(item);
+      });
 
+      // Ordenar por fecha (más recientes primero)
+      allOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+      allOrders.forEach(item => {
+        const produced = item.producedUnits || 0;
+        const total = item.unitsTotal || 1;
+        const pct = Math.min(100, Math.round((produced / total) * 100));
+        const isComplete = produced >= total;
+
+        // Cálculos Dashboard
+        sumRevenue += item.grossRevenue;
+        sumProfit += item.netProfit;
+        if (!isComplete) {
+          countActive++;
+          countPendingParts += (total - produced);
+        }
+
+        // Construir Tarjeta de Pedido
         const card = document.createElement('div');
         card.className = 'order-card';
         card.innerHTML = `
           <div class="order-header">
             <div>
-              <h3 style="color:#f3f4f6;">${item.client} — <span style="color:var(--accent);">${item.objectName}</span></h3>
-              <p style="color:var(--text-muted); font-size:0.8rem; margin-top:2px;">
-                Total: <strong>${item.totalPrice.toFixed(2)} €</strong> (${item.units} uds x ${item.unitPrice.toFixed(2)} €)
-              </p>
+              <div class="order-meta">
+                <span class="badge badge-channel">${item.channel}</span>
+                <span class="badge" style="background:${isComplete ? 'var(--success)' : 'var(--accent)'}; color:${isComplete ? '#000' : 'var(--accent-black)'};">${isComplete ? 'Completado' : 'Producción'}</span>
+              </div>
+              <h3 style="color:#f8fafc; font-size:1.1rem; margin-top:8px;">${item.objectName} <span style="color:var(--text-muted); font-weight:400; font-size:0.9rem;">para ${item.client}</span></h3>
+              <p style="color:var(--text-muted); font-size:0.8rem; margin-top:4px;">Materiales: ${item.filaments.map(f => f.name).join(', ')}</p>
             </div>
-            <button class="btn-delete" onclick="deleteOrder('${id}')">Eliminar</button>
+            <button class="btn-delete" onclick="deleteOrder('${item.id}')">Eliminar registro</button>
+          </div>
+
+          <div class="financial-summary">
+            <div class="fin-item">
+              <span>Coste Producción</span>
+              <strong>${item.totalProductionCost.toFixed(2)} €</strong>
+            </div>
+            <div class="fin-item net">
+              <span>Beneficio Neto Real</span>
+              <strong>+${item.netProfit.toFixed(2)} €</strong>
+            </div>
           </div>
 
           <div class="production-control">
             <div>
-              <p style="font-size:0.8rem; color:var(--text-muted);">Progresión de fabricación:</p>
-              <strong style="color:#f3f4f6;">${produced} de ${total} piezas</strong>
+              <p style="font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Progreso de Piezas</p>
+              <strong style="color:#f8fafc; font-size:1.2rem;">${produced} / ${total}</strong>
             </div>
-
             <div class="prod-inputs">
-              <input type="number" min="0" max="${total}" value="${produced}" onchange="updateProducedManual('${id}', this.value)">
-              <button class="btn-batch" onclick="addBatch('${id}', ${produced}, ${item.unitsPerBed || 1}, ${total})">+1 Tanda (${item.unitsPerBed || 1} uds)</button>
+              <input type="number" min="0" max="${total}" value="${produced}" onchange="updateProducedManual('${item.id}', this.value)">
+              <button class="btn-secondary" onclick="addBatch('${item.id}', ${produced}, ${item.unitsPerBed || 1}, ${total})">+ Imprimir Tanda (${item.unitsPerBed || 1})</button>
             </div>
           </div>
-
-          <div class="progress-bar-bg">
-            <div class="progress-bar-fill" style="width: ${pct}%;"></div>
-          </div>
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${pct}%; background:${isComplete ? 'var(--success)' : 'var(--accent)'}"></div></div>
         `;
+        
         container.appendChild(card);
+        
+        // Copiar las 3 tarjetas más recientes al Dashboard
+        if (recentContainer.children.length < 3) {
+          recentContainer.appendChild(card.cloneNode(true));
+        }
       });
+
+      // Actualizar Métricas del Dashboard
+      document.getElementById('dashRevenue').textContent = `${sumRevenue.toFixed(2)} €`;
+      document.getElementById('dashProfit').textContent = `${sumProfit.toFixed(2)} €`;
+      document.getElementById('dashActiveOrders').textContent = countActive;
+      document.getElementById('dashPendingParts').textContent = countPendingParts;
     });
 
     window.updateProducedManual = async (id, val) => {
@@ -414,7 +521,7 @@
     };
 
     window.deleteOrder = async (id) => {
-      if (confirm('¿Borrar pedido?')) await deleteDoc(doc(db, "pedidos", id));
+      if (confirm('¿Eliminar este registro de pedido de forma permanente?')) await deleteDoc(doc(db, "pedidos", id));
     };
   </script>
 </body>

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Taller 3D — Control de producción</title>
+  <style>
+    :root {
+      --bg: #12151e;
+      --card-bg: #1a1e2b;
+      --border: #2a3042;
+      --text: #e1e7ec;
+      --text-muted: #8c9ba5;
+      --accent: #f5a623;
+      --accent-hover: #e0951a;
+      --input-bg: #121622;
+      --danger: #e74c3c;
+      --success: #2ecc71;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 16px; max-width: 950px; margin: 0 auto; }
+
+    header { margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .logo { background: var(--accent); color: #000; font-weight: bold; padding: 6px 10px; border-radius: 6px; font-size: 1.2rem; }
+    h1 { font-size: 1.3rem; font-weight: 600; }
+    .subtitle { color: var(--text-muted); font-size: 0.85rem; margin-top: 2px; }
+
+    nav { display: flex; gap: 12px; border-bottom: 1px solid var(--border); margin-bottom: 20px; padding-bottom: 8px; }
+    nav button { background: none; border: none; color: var(--text-muted); font-size: 0.95rem; cursor: pointer; padding: 8px 16px; border-bottom: 2px solid transparent; }
+    nav button.active { color: var(--text); border-bottom-color: var(--accent); font-weight: 600; }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 20px; }
+    .card h2 { font-size: 1.05rem; margin-bottom: 14px; font-weight: 500; color: var(--accent); }
+
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    label { font-size: 0.8rem; color: var(--text-muted); }
+    input, select { background: var(--input-bg); border: 1px solid var(--border); color: var(--text); padding: 10px; border-radius: 6px; font-size: 0.9rem; outline: none; }
+    input:focus, select:focus { border-color: var(--accent); }
+
+    .btn-primary { background: var(--accent); color: #111; border: none; font-weight: 600; padding: 10px 16px; border-radius: 6px; cursor: pointer; transition: background 0.2s; height: 40px; }
+    .btn-primary:hover { background: var(--accent-hover); }
+
+    .inventory-list, .orders-list { display: grid; gap: 10px; }
+    .item-card { background: var(--input-bg); border: 1px solid var(--border); padding: 12px 16px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .item-info { display: flex; align-items: center; gap: 12px; }
+    .color-swatch { width: 28px; height: 28px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); flex-shrink: 0; }
+
+    .calc-results { background: var(--input-bg); border: 1px solid var(--border); padding: 16px; border-radius: 8px; margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; text-align: center; }
+    .result-box h4 { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
+    .result-box p { font-size: 1.2rem; font-weight: bold; margin-top: 4px; color: var(--text); }
+    .result-box.total p { color: var(--accent); font-size: 1.4rem; }
+
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+    .badge-pending { background: #d35400; color: #fff; }
+    .badge-completed { background: var(--success); color: #000; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="logo">3D</div>
+      <div>
+        <h1>Taller 3D — Control de producción</h1>
+        <p class="subtitle">Filamento, costes y pedidos en un solo sitio</p>
+      </div>
+    </div>
+  </header>
+
+  <nav>
+    <button class="active" onclick="switchTab('filamentos')">Filamentos</button>
+    <button onclick="switchTab('calculadora')">Calculadora</button>
+    <button onclick="switchTab('pedidos')">Pedidos</button>
+  </nav>
+
+  <!-- Pestaña 1: Filamentos -->
+  <div id="tab-filamentos" class="tab-content active">
+    <div class="card">
+      <h2>Añadir filamento</h2>
+      <form id="filamentForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Material</label>
+            <input type="text" id="material" placeholder="PLA, PETG, ABS..." required>
+          </div>
+          <div class="form-group">
+            <label>Color</label>
+            <input type="text" id="colorName" placeholder="Rojo fuego" required>
+          </div>
+          <div class="form-group">
+            <label>Muestra de color</label>
+            <input type="color" id="colorHex" value="#f5a623" style="height: 40px; padding: 2px; cursor: pointer;">
+          </div>
+          <div class="form-group">
+            <label>Stock actual (g)</label>
+            <input type="number" id="stock" placeholder="1000" min="0" required>
+          </div>
+          <div class="form-group">
+            <label>Precio de compra (€/kg)</label>
+            <input type="number" id="price" step="0.01" placeholder="19.90" min="0" required>
+          </div>
+          <div class="form-group" style="justify-content: flex-end;">
+            <button type="submit" class="btn-primary">Añadir a inventario</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Inventario de Filamentos</h2>
+      <div id="inventoryContainer" class="inventory-list"></div>
+    </div>
+  </div>
+
+  <!-- Pestaña 2: Calculadora -->
+  <div id="tab-calculadora" class="tab-content">
+    <div class="card">
+      <h2>Calculadora de costes por pieza</h2>
+      <form id="calcForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Seleccionar Filamento</label>
+            <select id="calcFilamentSelect" required></select>
+          </div>
+          <div class="form-group">
+            <label>Peso de la pieza (g)</label>
+            <input type="number" id="calcWeight" placeholder="120" min="1" required>
+          </div>
+          <div class="form-group">
+            <label>Tiempo de impresión (Horas)</label>
+            <input type="number" id="calcHours" step="0.1" placeholder="4.5" required>
+          </div>
+          <div class="form-group">
+            <label>Consumo Impresora (W)</label>
+            <input type="number" id="calcPower" value="150" required>
+          </div>
+          <div class="form-group">
+            <label>Precio Luz (€/kWh)</label>
+            <input type="number" id="calcElectricityPrice" step="0.01" value="0.25" required>
+          </div>
+          <div class="form-group">
+            <label>Margen de Beneficio (%)</label>
+            <input type="number" id="calcMargin" value="30" required>
+          </div>
+        </div>
+      </form>
+
+      <div class="calc-results">
+        <div class="result-box">
+          <h4>Coste Filamento</h4>
+          <p id="resFilament">0.00 €</p>
+        </div>
+        <div class="result-box">
+          <h4>Coste Luz</h4>
+          <p id="resPower">0.00 €</p>
+        </div>
+        <div class="result-box">
+          <h4>Coste Total Producción</h4>
+          <p id="resBase">0.00 €</p>
+        </div>
+        <div class="result-box total">
+          <h4>Precio Venta Sugerido</h4>
+          <p id="resTotal">0.00 €</p>
+        </div>
+      </div>
+      
+      <div style="margin-top: 16px; text-align: right;">
+        <button type="button" class="btn-primary" onclick="createOrderFromCalc()">Crear Pedido y Descontar Stock</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pestaña 3: Pedidos -->
+  <div id="tab-pedidos" class="tab-content">
+    <div class="card">
+      <h2>Control de Pedidos</h2>
+      <div id="ordersContainer" class="orders-list"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAEFQO0ulPrzrbmDOsvhHYKphnGnMJTDi8",
+      authDomain: "taller-3d-000.firebaseapp.com",
+      projectId: "taller-3d-000",
+      storageBucket: "taller-3d-000.firebasestorage.app",
+      messagingSenderId: "19958615596",
+      appId: "1:19958615596:web:f2217206ae338f3eda4b89",
+      measurementId: "G-3C4NFGG8TP"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    
+    const filamentsRef = collection(db, "filamentos");
+    const ordersRef = collection(db, "pedidos");
+
+    let loadedFilaments = [];
+
+    // Navegación de pestañas
+    window.switchTab = (tabName) => {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
+      
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+      event.target.classList.add('active');
+    };
+
+    // --- FILAMENTOS ---
+    document.getElementById('filamentForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await addDoc(filamentsRef, {
+        material: document.getElementById('material').value,
+        colorName: document.getElementById('colorName').value,
+        colorHex: document.getElementById('colorHex').value,
+        stock: Number(document.getElementById('stock').value),
+        price: Number(document.getElementById('price').value),
+        createdAt: new Date()
+      });
+      document.getElementById('filamentForm').reset();
+    });
+
+    onSnapshot(filamentsRef, (snapshot) => {
+      const container = document.getElementById('inventoryContainer');
+      const select = document.getElementById('calcFilamentSelect');
+      
+      container.innerHTML = '';
+      select.innerHTML = '<option value="">Selecciona un filamento...</option>';
+      loadedFilaments = [];
+
+      snapshot.forEach((docSnap) => {
+        const item = docSnap.data();
+        const id = docSnap.id;
+        loadedFilaments.push({ id, ...item });
+
+        // Pintar Inventario
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.innerHTML = `
+          <div class="item-info">
+            <div class="color-swatch" style="background-color: ${item.colorHex};"></div>
+            <div>
+              <h3>${item.material} — ${item.colorName}</h3>
+              <p style="font-size:0.8rem; color:var(--text-muted)">Stock: <strong>${item.stock} g</strong> | Precio: <strong>${item.price.toFixed(2)} €/kg</strong></p>
+            </div>
+          </div>
+          <button style="background:none; border:1px solid var(--danger); color:var(--danger); padding:4px 8px; border-radius:4px; cursor:pointer;" onclick="deleteItem('${id}')">Eliminar</button>
+        `;
+        container.appendChild(card);
+
+        // Llenar Select de Calculadora
+        const opt = document.createElement('option');
+        opt.value = id;
+        opt.textContent = `${item.material} - ${item.colorName} (${item.stock}g disponibles)`;
+        select.appendChild(opt);
+      });
+    });
+
+    window.deleteItem = async (id) => {
+      if (confirm('¿Borrar filamento?')) await deleteDoc(doc(db, "filamentos", id));
+    };
+
+    // --- CALCULADORA ---
+    const calcInputs = ['calcFilamentSelect', 'calcWeight', 'calcHours', 'calcPower', 'calcElectricityPrice', 'calcMargin'];
+    calcInputs.forEach(id => document.getElementById(id).addEventListener('input', calculateCost));
+
+    let currentCalculatedPrice = 0;
+
+    function calculateCost() {
+      const filId = document.getElementById('calcFilamentSelect').value;
+      const weight = Number(document.getElementById('calcWeight').value) || 0;
+      const hours = Number(document.getElementById('calcHours').value) || 0;
+      const watts = Number(document.getElementById('calcPower').value) || 0;
+      const kwhPrice = Number(document.getElementById('calcElectricityPrice').value) || 0;
+      const margin = Number(document.getElementById('calcMargin').value) || 0;
+
+      const filament = loadedFilaments.find(f => f.id === filId);
+      const filPricePerGram = filament ? (filament.price / 1000) : 0;
+
+      const costFilament = weight * filPricePerGram;
+      const costPower = (watts / 1000) * hours * kwhPrice;
+      const costBase = costFilament + costPower;
+      const priceTotal = costBase * (1 + (margin / 100));
+
+      currentCalculatedPrice = priceTotal;
+
+      document.getElementById('resFilament').textContent = `${costFilament.toFixed(2)} €`;
+      document.getElementById('resPower').textContent = `${costPower.toFixed(2)} €`;
+      document.getElementById('resBase').textContent = `${costBase.toFixed(2)} €`;
+      document.getElementById('resTotal').textContent = `${priceTotal.toFixed(2)} €`;
+    }
+
+    window.createOrderFromCalc = async () => {
+      const filId = document.getElementById('calcFilamentSelect').value;
+      const weight = Number(document.getElementById('calcWeight').value);
+      
+      if (!filId || !weight) {
+        alert("Por favor selecciona un filamento y peso válido.");
+        return;
+      }
+
+      const clientName = prompt("Nombre del cliente o referencia de pedido:");
+      if (!clientName) return;
+
+      const filament = loadedFilaments.find(f => f.id === filId);
+
+      // 1. Guardar Pedido
+      await addDoc(ordersRef, {
+        client: clientName,
+        filament: `${filament.material} (${filament.colorName})`,
+        weight: weight,
+        price: currentCalculatedPrice,
+        status: "Pendiente",
+        createdAt: new Date()
+      });
+
+      // 2. Descontar Stock del Filamento
+      const newStock = Math.max(0, filament.stock - weight);
+      await updateDoc(doc(db, "filamentos", filId), { stock: newStock });
+
+      alert("¡Pedido guardado y stock de filamento descontado!");
+      switchTab('pedidos');
+    };
+
+    // --- PEDIDOS ---
+    onSnapshot(ordersRef, (snapshot) => {
+      const container = document.getElementById('ordersContainer');
+      container.innerHTML = '';
+
+      snapshot.forEach((docSnap) => {
+        const item = docSnap.data();
+        const id = docSnap.id;
+
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.innerHTML = `
+          <div>
+            <h3>${item.client}</h3>
+            <p style="font-size:0.8rem; color:var(--text-muted)">${item.filament} | ${item.weight}g | Total: <strong>${item.price.toFixed(2)} €</strong></p>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <span class="badge ${item.status === 'Completado' ? 'badge-completed' : 'badge-pending'}">${item.status}</span>
+            <button style="background:none; border:1px solid var(--accent); color:var(--accent); padding:4px 8px; border-radius:4px; cursor:pointer;" onclick="toggleOrderStatus('${id}', '${item.status}')">Cambiar Estado</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    });
+
+    window.toggleOrderStatus = async (id, currentStatus) => {
+      const newStatus = currentStatus === 'Pendiente' ? 'Completado' : 'Pendiente';
+      await updateDoc(doc(db, "pedidos", id), { status: newStatus });
+    };
+  </script>
+</body>
+</html>
